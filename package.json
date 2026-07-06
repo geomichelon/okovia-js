@@ -16,10 +16,11 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node test/run-tests.mjs",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
-    "typescript": "^5.2.0"
+    "typescript": "^5.2.0",
+    "vitest": "0.34.6"
   }
 }
