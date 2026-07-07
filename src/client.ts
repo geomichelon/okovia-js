@@ -11,6 +11,9 @@ import type {
   VikingClientOptions,
 } from "./types.js";
 
+// Compat rule: X-SDK-Version goes on every request.
+const SDK_VERSION = "0.1.0";
+
 const DEFAULT_BATCH_SIZE = 10;
 const DEFAULT_FLUSH_INTERVAL_MS = 5000;
 const DEFAULT_MAX_RETRIES = 3;
@@ -36,8 +39,8 @@ export class VikingClient {
     assertNonEmpty(options.projectId, "projectId");
     assertNonEmpty(options.endpoint, "endpoint");
 
-    if (!options.publicKey.startsWith("vk_pub_")) {
-      throw new Error("VikingClient must be initialized with a public browser key. Secret keys are not allowed.");
+    if (!options.publicKey.startsWith("vik_pub_") && !options.publicKey.startsWith("vk_pub_")) {
+      throw new Error("VikingClient must be initialized with a public browser key (vik_pub_...). Secret keys are not allowed.");
     }
 
     const fetchImpl = options.fetch ?? globalThis.fetch;
@@ -165,6 +168,7 @@ export class VikingClient {
       headers: {
         "Content-Type": "application/json",
         "X-API-Key": this.publicKey,
+        "X-SDK-Version": SDK_VERSION,
       },
       body: JSON.stringify(payload),
       keepalive: true,
