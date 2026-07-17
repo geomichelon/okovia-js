@@ -21,11 +21,14 @@
 import { VikingClient } from "./client.js";
 import {
   ANONYMOUS_ID_KEY,
+  OPERATION_ID_HEADER,
   SESSION_ID_KEY,
   createOperationId,
   featureFromPath,
   getOrCreateId,
+  parseCorrelatePaths,
   resolveTagConfig,
+  shouldCorrelate,
 } from "./tag-core.js";
 import type { JsonValue, TrackProperties } from "./types.js";
 
@@ -122,6 +125,38 @@ declare global {
   patchHistory("pushState");
   patchHistory("replaceState");
   window.addEventListener("popstate", trackPageView);
+
+  // Phase 2 (opt-in): automatic browser->backend correlation. When the
+  // snippet declares data-correlate="/api/ai,/chat", same-origin fetches
+  // matching those path prefixes get an X-Okovia-Operation-Id header and
+  // a client event carrying the product context, so backend usage
+  // recorded under the same id joins into one operation.
+  const correlatePaths = parseCorrelatePaths(script?.dataset.correlate);
+  if (correlatePaths.length > 0 && typeof window.fetch === "function") {
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+      const url =
+        typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      if (!shouldCorrelate(url, window.location.origin, correlatePaths)) {
+        return originalFetch(input, init);
+      }
+
+      const headers = new Headers(
+        init?.headers ?? (input instanceof Request ? input.headers : undefined)
+      );
+      if (headers.has(OPERATION_ID_HEADER)) {
+        return originalFetch(input, init);
+      }
+
+      const operationId = createOperationId();
+      headers.set(OPERATION_ID_HEADER, operationId);
+      track("operation_context", {
+        operationId,
+        request_path: new URL(url, window.location.origin).pathname,
+      });
+      return originalFetch(input, { ...init, headers });
+    };
+  }
 
   // Don't lose the tail of the session: flush when the page hides.
   document.addEventListener("visibilitychange", () => {

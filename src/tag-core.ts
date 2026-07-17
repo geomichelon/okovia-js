@@ -62,3 +62,37 @@ export function getOrCreateId(storage: StorageLike | undefined, key: string): st
 export function createOperationId(): string {
   return `op_${createEventId().slice(4)}`;
 }
+
+export const OPERATION_ID_HEADER = "X-Okovia-Operation-Id";
+
+/** Parses data-correlate ("/api/ai,/chat") into clean path prefixes.
+ *  Empty/absent means correlation stays off — the tag never touches
+ *  fetch unless the customer opted in. */
+export function parseCorrelatePaths(value: string | undefined): string[] {
+  if (!value) {
+    return [];
+  }
+  return value
+    .split(",")
+    .map((prefix) => prefix.trim())
+    .filter((prefix) => prefix.startsWith("/"));
+}
+
+/** Same-origin + opted-in path prefix: the only requests that get the
+ *  operation-id header. Cross-origin is never touched (both to avoid
+ *  CORS preflight breakage and to never leak ids to third parties). */
+export function shouldCorrelate(url: string, pageOrigin: string, prefixes: string[]): boolean {
+  if (prefixes.length === 0) {
+    return false;
+  }
+  let resolved: URL;
+  try {
+    resolved = new URL(url, pageOrigin);
+  } catch {
+    return false;
+  }
+  if (resolved.origin !== pageOrigin) {
+    return false;
+  }
+  return prefixes.some((prefix) => resolved.pathname.startsWith(prefix));
+}

@@ -6,7 +6,9 @@ import {
   createOperationId,
   featureFromPath,
   getOrCreateId,
+  parseCorrelatePaths,
   resolveTagConfig,
+  shouldCorrelate,
 } from "../src/tag-core.js";
 
 describe("resolveTagConfig", () => {
@@ -75,6 +77,40 @@ describe("getOrCreateId", () => {
       },
     };
     expect(getOrCreateId(throwing, ANONYMOUS_ID_KEY)).toMatch(/^anon_/);
+  });
+});
+
+describe("parseCorrelatePaths", () => {
+  it("splits and trims path prefixes", () => {
+    expect(parseCorrelatePaths("/api/ai, /chat")).toEqual(["/api/ai", "/chat"]);
+  });
+
+  it("drops entries that are not absolute paths", () => {
+    expect(parseCorrelatePaths("api,https://x.com/a,/ok")).toEqual(["/ok"]);
+  });
+
+  it("is empty (correlation off) without config", () => {
+    expect(parseCorrelatePaths(undefined)).toEqual([]);
+    expect(parseCorrelatePaths("")).toEqual([]);
+  });
+});
+
+describe("shouldCorrelate", () => {
+  const origin = "https://app.example.com";
+  const prefixes = ["/api/ai"];
+
+  it("matches same-origin requests under an opted-in prefix", () => {
+    expect(shouldCorrelate("/api/ai/summarize", origin, prefixes)).toBe(true);
+    expect(shouldCorrelate("https://app.example.com/api/ai/x", origin, prefixes)).toBe(true);
+  });
+
+  it("never touches cross-origin requests", () => {
+    expect(shouldCorrelate("https://api.openai.com/v1/chat", origin, prefixes)).toBe(false);
+  });
+
+  it("ignores non-matching paths and empty prefix lists", () => {
+    expect(shouldCorrelate("/health", origin, prefixes)).toBe(false);
+    expect(shouldCorrelate("/api/ai/x", origin, [])).toBe(false);
   });
 });
 
