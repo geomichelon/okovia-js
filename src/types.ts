@@ -6,7 +6,9 @@ export type VikingChannel = "web" | "ios" | "android" | "backend" | string;
 
 export interface VikingClientOptions {
   publicKey: string;
-  projectId: string;
+  /** Optional: the API derives the project from the public key when
+   *  omitted, which is how the drop-in tag ships with only a key. */
+  projectId?: string;
   endpoint: string;
   workspaceId?: string;
   batchSize?: number;
@@ -30,7 +32,7 @@ export interface ClientEventPayload {
   event_id: string;
   operation_id: string;
   workspace_id?: string;
-  project_id: string;
+  project_id?: string;
   event_name: string;
   channel?: VikingChannel;
   session_id?: string;

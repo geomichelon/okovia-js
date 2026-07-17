@@ -21,7 +21,7 @@ const DEFAULT_RETRY_BASE_DELAY_MS = 500;
 
 export class VikingClient {
   private readonly publicKey: string;
-  private readonly projectId: string;
+  private readonly projectId?: string;
   private readonly workspaceId?: string;
   private readonly endpoint: string;
   private readonly batchSize: number;
@@ -36,7 +36,9 @@ export class VikingClient {
 
   constructor(options: VikingClientOptions) {
     assertNonEmpty(options.publicKey, "publicKey");
-    assertNonEmpty(options.projectId, "projectId");
+    if (options.projectId !== undefined) {
+      assertNonEmpty(options.projectId, "projectId");
+    }
     assertNonEmpty(options.endpoint, "endpoint");
 
     if (!options.publicKey.startsWith("vik_pub_") && !options.publicKey.startsWith("vk_pub_")) {
@@ -131,9 +133,13 @@ export class VikingClient {
     const payload: ClientEventPayload = {
       event_id: eventId,
       operation_id: operationId,
-      project_id: this.projectId,
       event_name: eventName,
     };
+
+    // Both are derived from the public key server-side when omitted.
+    if (this.projectId) {
+      payload.project_id = this.projectId;
+    }
 
     if (this.workspaceId) {
       payload.workspace_id = this.workspaceId;

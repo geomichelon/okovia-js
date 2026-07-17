@@ -16,10 +16,12 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "build:tag": "esbuild src/tag.ts --bundle --format=iife --minify --target=es2019 --banner:js=\"/* OkOvia Tag — generated from sdks/javascript (npm run build:tag). Do not edit. */\" --outfile=../../apps/web/public/js/okovia.js",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
+    "esbuild": "^0.28.1",
     "typescript": "^5.2.0",
     "vitest": "0.34.6"
   }
