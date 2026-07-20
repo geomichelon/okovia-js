@@ -1,42 +1,46 @@
-# @viking/telemetry-js
+# okovia
 
-Browser SDK for sending Viking client events from web applications.
+OkOvia browser telemetry SDK for web applications.
 
 The SDK is intentionally narrow: it sends product behavior context only. It does not capture prompts, responses, DOM content, cookies, headers, local storage, forms, or sensitive data automatically.
+
+> Prefer a drop-in script tag? The [OkOvia Tag](https://okovia.com) (`okovia.com/js/okovia.js`) is a bundled build of this same SDK — no npm needed. Use this package when you want typed, programmatic control.
 
 ## Install
 
 ```bash
-npm install @viking/telemetry-js
+npm install okovia
 ```
 
 ## Usage
 
 ```ts
-import { VikingClient } from "@viking/telemetry-js";
+import { OkoviaClient } from "okovia";
 
-const viking = new VikingClient({
-  publicKey: "vk_pub_xxx",
+const okovia = new OkoviaClient({
+  publicKey: "vik_pub_xxx",
   projectId: "project_123",
-  endpoint: "https://api.viking.dev",
+  endpoint: "https://api.okovia.com",
 });
 
-viking.track("ai_interaction_requested", {
+okovia.track("ai_interaction_requested", {
   operationId: "op_123",
   feature: "credit_card_explanation",
   channel: "web",
 });
 ```
 
-`operationId` is required because Viking uses it to correlate product behavior with backend usage events and cost calculations.
+`operationId` is required because OkOvia uses it to correlate product behavior with backend usage events and cost calculations.
+
+> `VikingClient` remains exported as an alias, so existing integrations keep working after moving to the `okovia` package.
 
 ## Configuration
 
 ```ts
-const viking = new VikingClient({
-  publicKey: "vk_pub_xxx",
+const okovia = new OkoviaClient({
+  publicKey: "vik_pub_xxx",
   projectId: "project_123",
-  endpoint: "https://api.viking.dev",
+  endpoint: "https://api.okovia.com",
   batchSize: 10,
   flushIntervalMs: 5000,
   maxRetries: 3,
@@ -46,10 +50,10 @@ const viking = new VikingClient({
 
 Options:
 
-- `publicKey`: required. Must start with `vk_pub_`. Never use a secret key in the browser.
+- `publicKey`: required. Must start with `vik_pub_`. Never use a secret key in the browser.
 - `projectId`: required. Identifies the project that owns the event.
-- `endpoint`: required. Viking API base URL.
-- `workspaceId`: optional. Viking Cloud can derive workspace scope from the public key; self-hosted MVP deployments may require this until the API derives it server-side.
+- `endpoint`: required. OkOvia API base URL.
+- `workspaceId`: optional. OkOvia Cloud can derive workspace scope from the public key; self-hosted deployments may require this until the API derives it server-side.
 - `batchSize`: optional. Number of queued events that triggers an automatic flush. Default: `10`.
 - `flushIntervalMs`: optional. Time-based automatic flush interval. Default: `5000`.
 - `maxRetries`: optional. Retry attempts per event. Default: `3`.
@@ -58,7 +62,7 @@ Options:
 ## Manual Flush
 
 ```ts
-await viking.flush();
+await okovia.flush();
 ```
 
 Use `flush()` before route transitions, sign-out, or other moments where you want to force pending events to be sent.
@@ -94,12 +98,6 @@ Do not pass prompts, completions, documents, card numbers, bank account numbers,
 
 The SDK performs defensive key-based filtering for obvious sensitive field names, but callers remain responsible for sending only safe metadata.
 
-## Development
+## License
 
-```bash
-npm install
-npm run build
-npm test
-```
-
-The package is TypeScript-first and emits ESM JavaScript plus `.d.ts` declarations in `dist/`.
+MIT — see [LICENSE](./LICENSE).

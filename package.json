@@ -1,18 +1,46 @@
 {
-  "name": "@viking/telemetry-js",
+  "name": "okovia",
   "version": "0.1.0",
-  "description": "Browser telemetry SDK for Viking client events.",
+  "description": "OkOvia browser telemetry SDK — sends product behavior context (no prompts, responses, or sensitive data) so AI cost can be attributed to features.",
+  "license": "MIT",
+  "homepage": "https://okovia.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geomichelon/okovia-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/geomichelon/okovia-js/issues"
+  },
+  "keywords": [
+    "okovia",
+    "telemetry",
+    "ai",
+    "llm",
+    "cost",
+    "observability",
+    "analytics"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "sideEffects": false,
   "engines": {
     "node": ">=16.16"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
