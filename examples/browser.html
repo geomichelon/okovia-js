@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- OkOvia JS SDK — minimal browser example.
+
+     Two ways to use OkOvia in the browser:
+
+     1. The OkOvia Tag (zero build): one <script> snippet served from
+        okovia.com — this file uses it, so you can open the page as-is.
+     2. The npm package (typed, programmatic): `npm install okovia` and
+        import { OkoviaClient } — shown in the commented block below; use
+        it when you have a bundler (Vite, Next, webpack...).
+
+     Both send product behavior metadata only — never prompts, responses,
+     DOM content, or anything sensitive. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OkOvia — browser example</title>
+  <style>
+    body { font: 15px/1.5 system-ui, sans-serif; max-width: 640px; margin: 3rem auto; padding: 0 1rem; }
+    button { padding: .5rem 1rem; margin-right: .5rem; }
+    pre { background: #f4f4f5; padding: 1rem; border-radius: 8px; overflow-x: auto; }
+  </style>
+
+  <!-- ── Way 1: the OkOvia Tag (edit data-key / data-project) ─────────── -->
+  <script async
+          src="https://okovia.com/js/okovia.js"
+          data-key="vik_pub_REPLACE_ME"
+          data-project="REPLACE_WITH_PROJECT_UUID"></script>
+</head>
+<body>
+  <h1>OkOvia — browser example</h1>
+  <p>Edit <code>data-key</code> / <code>data-project</code> in this file's
+     <code>&lt;head&gt;</code>, open the page, then:</p>
+
+  <p>
+    <button id="track">Track AI interaction</button>
+  </p>
+  <pre id="log">Waiting…</pre>
+
+  <script>
+    const log = (m) => (document.getElementById("log").textContent = m);
+    document.getElementById("track").addEventListener("click", () => {
+      // The tag exposes a global queue-style API, like analytics tags do.
+      // "feature" is what lets OkOvia attribute cost per product feature.
+      okovia("track", "ai_interaction_requested", {
+        feature: "checkout_summary",
+        channel: "web"
+      });
+      log("Tracked ai_interaction_requested (feature=checkout_summary).");
+    });
+  </script>
+
+  <!-- ── Way 2: the npm package (for apps with a bundler) ──────────────
+  <script type="module">
+    // npm install okovia
+    import { OkoviaClient } from "okovia";
+
+    const okovia = new OkoviaClient({
+      publicKey: "vik_pub_...",
+      projectId: "...",
+      endpoint: "https://api.okovia.com"
+    });
+
+    okovia.track("ai_interaction_requested", {
+      operationId: "op_123",       // correlates with backend usage/cost
+      feature: "checkout_summary",
+      channel: "web"
+    });
+  </script>
+  ─────────────────────────────────────────────────────────────────── -->
+</body>
+</html>
