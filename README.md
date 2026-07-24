@@ -4,7 +4,14 @@ OkOvia browser telemetry SDK for web applications.
 
 The SDK is intentionally narrow: it sends product behavior context only. It does not capture prompts, responses, DOM content, cookies, headers, local storage, forms, or sensitive data automatically.
 
-> Prefer a drop-in script tag? The [OkOvia Tag](https://okovia.com) (`okovia.com/js/okovia.js`) is a bundled build of this same SDK — no npm needed. Use this package when you want typed, programmatic control.
+> Prefer a drop-in script tag? The [OkOvia Tag](https://okovia.com) (`okovia.com/js/okovia.js`) is a bundled build of this same SDK — no npm needed. The same build also ships inside this package and is served by the public CDNs:
+>
+> ```html
+> <script async src="https://unpkg.com/okovia" data-key="vik_pub_XXXX"></script>
+> <!-- or: https://cdn.jsdelivr.net/npm/okovia -->
+> ```
+>
+> Use the npm package as a module when you want typed, programmatic control.
 
 ## Install
 
@@ -38,6 +45,8 @@ okovia.track("ai_interaction_requested", {
 ```
 
 `operationId` is required because OkOvia uses it to correlate product behavior with backend usage events and cost calculations.
+
+The package ships both module formats: `import` resolves the ESM build, and CommonJS projects (Jest, `ts-node`, Node backends) can `require("okovia")` — same API, own type declarations per format.
 
 > `VikingClient` remains exported as an alias, so existing integrations keep working after moving to the `okovia` package.
 

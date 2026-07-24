@@ -1,6 +1,6 @@
 {
   "name": "okovia",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "OkOvia browser telemetry SDK — sends product behavior context (no prompts, responses, or sensitive data) so AI cost can be attributed to features.",
   "license": "MIT",
   "homepage": "https://okovia.com",
@@ -21,21 +21,32 @@
     "analytics"
   ],
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/cjs/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./package.json": "./package.json"
   },
+  "unpkg": "./dist/okovia.tag.js",
+  "jsdelivr": "./dist/okovia.tag.js",
   "bin": {
     "okovia": "./bin/okovia.mjs"
   },
   "files": [
     "bin",
     "dist",
+    "src",
+    "CHANGELOG.md",
     "README.md",
     "LICENSE"
   ],
@@ -47,9 +58,13 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "npm run build:esm && npm run build:cjs && npm run build:cdn",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json && node scripts/write-cjs-pkg.mjs",
+    "build:cdn": "esbuild src/tag.ts --bundle --format=iife --minify --target=es2019 --banner:js=\"/* OkOvia Tag — same build served at okovia.com/js/okovia.js. Add data-key to the script tag. */\" --outfile=dist/okovia.tag.js",
     "build:tag": "esbuild src/tag.ts --bundle --format=iife --minify --target=es2019 --banner:js=\"/* OkOvia Tag — generated from sdks/javascript (npm run build:tag). Do not edit. */\" --outfile=../../apps/web/public/js/okovia.js",
     "test": "vitest run",
+    "test:pack": "node scripts/pack-smoke.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
