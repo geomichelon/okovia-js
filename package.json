@@ -1,6 +1,6 @@
 {
   "name": "okovia",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "OkOvia browser telemetry SDK — sends product behavior context (no prompts, responses, or sensitive data) so AI cost can be attributed to features.",
   "license": "MIT",
   "homepage": "https://okovia.com",
@@ -30,7 +30,11 @@
       "import": "./dist/index.js"
     }
   },
+  "bin": {
+    "okovia": "./bin/okovia.mjs"
+  },
   "files": [
+    "bin",
     "dist",
     "README.md",
     "LICENSE"

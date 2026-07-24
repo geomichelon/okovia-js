@@ -12,6 +12,13 @@ The SDK is intentionally narrow: it sends product behavior context only. It does
 npm install okovia
 ```
 
+The package is intentionally tiny: zero runtime dependencies, just the compiled ESM modules and TypeScript types. After installing, ask it what you got:
+
+```bash
+npx okovia            # what's in the package + quickstart
+npx okovia doctor     # connectivity check against the OkOvia API
+```
+
 ## Usage
 
 ```ts
